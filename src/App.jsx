@@ -15,10 +15,10 @@ function App() {
   const [productImage, setProductImage] = useState(null);
   const [userName, setUserName] = useState('');
   const [userAge, setUserAge] = useState('');
-  const [userImage, setUserImage] = useState(null); // State to hold the user image
+  const [userImage, setUserImage] = useState(null);
 
   const handleAddProduct = () => {
-    if (productName && productPrice) {
+    if (productName && productPrice && productImage) {
       const productData = { id: Date.now(), name: productName, price: productPrice, image: productImage };
       dispatch(addProduct(productData));
       setProductName('');
@@ -70,53 +70,66 @@ function App() {
     }
   };
 
+  const handleProductImageChange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      setProductImage(reader.result);
+    };
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="container">
       <div className="left">
-       <div className="card">
-       <h2>User Details:</h2>
-        <div className="form-container">
-          <input type="text" placeholder="Name" value={userName} onChange={e => setUserName(e.target.value)} />
-          <input type="text" placeholder="Age" value={userAge} onChange={e => setUserAge(e.target.value)} />
-          <input type="file" accept="image/*" onChange={handleUserImageChange} /> {/* Add file input for user image upload */}
-          <button onClick={handleAddUser}>Add User</button>
+        <div className="card">
+          <h2>User Details:</h2>
+          <div className="form-container">
+            <input type="text" placeholder="Name" value={userName} onChange={e => setUserName(e.target.value)} />
+            <input type="text" placeholder="Age" value={userAge} onChange={e => setUserAge(e.target.value)} />
+            <input type="file" accept="image/*" onChange={handleUserImageChange} />
+            <button onClick={handleAddUser}>Add User</button>
+          </div>
         </div>
+        <div className="details">
+          <h2>User List:</h2>
+          <ul className="user-list">
+            {users.map(user => (
+              <li key={user.id}>
+                <p>Name: {user.name}</p>
+                <p>Age: {user.age}</p>
+                <img src={user.image} alt={user.name} />
+                <div className="form-container">
+                  <button onClick={() => handleEditUser(user.id, user.name, user.age)}>Update</button>
+                  <button onClick={() => handleDeleteUser(user.id)}>Delete</button>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
-      <div className="details">
-      <ul className="user-list">
-          {users.map(user => (
-            <li key={user.id}>
-              <p>Name: {user.name}</p>
-              <p>Age: {user.age}</p>
-              <img src={user.image} alt={user.name} /> {/* Display the user image */}
-              <div className="form-container">
-                <button onClick={() => handleEditUser(user.id, user.name, user.age)}>Update</button>
-                <button onClick={() => handleDeleteUser(user.id)}>Delete</button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-     
       </div>
       <div className="right">
         <div className="form-container">
           <div className="card">
-          <h2>Add Product:</h2>
-          <input type="text" placeholder="Name" value={productName} onChange={e => setProductName(e.target.value)} />
-          <input type="text" placeholder="Price" value={productPrice} onChange={e => setProductPrice(e.target.value)} />
-          <input type="file" accept="image/*" onChange={e => setProductImage(e.target.files[0])} /> {/* Add file input for product image upload */}
-          <button onClick={handleAddProduct}>Add Product</button>
+            <h2>Add Product:</h2>
+            <input type="text" placeholder="Name" value={productName} onChange={e => setProductName(e.target.value)} />
+            <input type="text" placeholder="Price" value={productPrice} onChange={e => setProductPrice(e.target.value)} />
+            <input type="file" accept="image/*" onChange={handleProductImageChange} />
+            <button onClick={handleAddProduct}>Add Product</button>
           </div>
         </div>
-        <div className='details'>
+        <div className="details">
           <h2>Product List:</h2>
           <ul className="product-list">
             {products.map(product => (
               <li key={product.id}>
                 <p>Name: {product.name}</p>
                 <p>Price: {product.price}</p>
-                <img src={product.image} alt={product.name} /> {/* Display the product image */}
+                <img src={product.image} alt={product.name} />
                 <div className="form-container">
                   <button onClick={() => handleDeleteProduct(product.id)}>Delete</button>
                 </div>
